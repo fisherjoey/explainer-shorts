@@ -1,0 +1,32 @@
+{
+  "name": "explainer-shorts",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "validate": "tsx scripts/validate.ts",
+    "stats": "tsx scripts/stats.ts",
+    "stills": "tsx scripts/stills.ts",
+    "render": "tsx scripts/render.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.524",
+    "@remotion/google-fonts": "4.0.524",
+    "@remotion/media": "4.0.524",
+    "remotion": "4.0.524",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}

@@ -1,0 +1,11 @@
+# your voice reference clip and narrator pictures stay local
+voice/
+public/narrator/
+public/_render/
+node_modules/
+.venv/
+out/
+videos/*/audio/
+__pycache__/
+*.pyc
+.pytest_cache/

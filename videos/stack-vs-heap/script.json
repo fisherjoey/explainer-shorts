@@ -1,0 +1,1384 @@
+{
+  "slug": "stack-vs-heap",
+  "title": "Stack vs Heap",
+  "pronounce": {
+    "brk": "B-R-K",
+    "mmap": "M-map",
+    "jemalloc": "J-E-malloc",
+    "glibc": "glib-C"
+  },
+  "slides": [
+    {
+      "id": "s01",
+      "section": "WHERE DATA LIVES",
+      "kicker": "TWO REGIONS",
+      "headline": "Every process has\na stack and a heap.",
+      "aside": "Code and globals get regions of their own, fixed at load time.",
+      "narration": "The stack and the heap are the two main places a program keeps its data.",
+      "visual": [
+        {
+          "type": "terminal",
+          "cue": "stack",
+          "title": "MEMORY MAP · AARCH64 · ASLR OFF",
+          "lines": [
+            {
+              "text": "aaaaaaab2000-aaaaaaad3000",
+              "right": "[heap]",
+              "tone": "accent"
+            },
+            {
+              "text": "…  libraries, mappings  …",
+              "tone": "muted"
+            },
+            {
+              "text": "fffffffdf000-1000000000000",
+              "right": "[stack]",
+              "tone": "teal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s02",
+      "section": "WHERE DATA LIVES",
+      "kicker": "THE SHARED QUESTION",
+      "headline": "Both decide how long\na value gets to *live*.",
+      "narration": "Both answer one question: how long must each piece of data live?",
+      "visual": [
+        {
+          "type": "kv",
+          "cue": "question",
+          "title": "TWO VALUES, TWO LIFETIMES",
+          "rows": [
+            {
+              "k": "a local variable",
+              "v": "until its call returns"
+            },
+            {
+              "k": "a returned buffer",
+              "v": "long after the call",
+              "tone": "accent"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s03",
+      "section": "WHERE DATA LIVES",
+      "kicker": "TWO ANSWERS",
+      "headline": "Same question,\n*opposite* answers.",
+      "layout": "full",
+      "narration": "The stack cleans up after every call. The heap waits until something frees it.",
+      "visual": [
+        {
+          "type": "compare",
+          "cue": "stack",
+          "left": {
+            "label": "STACK",
+            "title": "Freed on return",
+            "body": "Automatic, newest first.",
+            "tone": "beige"
+          },
+          "right": {
+            "label": "HEAP",
+            "title": "Freed on request",
+            "body": "By free, delete, or a garbage collector.",
+            "tone": "dark"
+          },
+          "caption": "same job, different lifetimes"
+        }
+      ]
+    },
+    {
+      "id": "s04",
+      "section": "THE STACK",
+      "kicker": "CHAPTER ONE",
+      "headline": "Stack memory lives\nand dies with a *call*.",
+      "narration": "Start with the stack. Its memory is tied to function calls.",
+      "visual": [
+        {
+          "type": "terminal",
+          "cue": "memory",
+          "title": "THE STACK · ONE FRAME PER CALL",
+          "lines": [
+            {
+              "text": "main",
+              "right": "frame",
+              "tone": "muted"
+            },
+            {
+              "text": "area",
+              "right": "frame",
+              "tone": "accent"
+            },
+            {
+              "text": "sp →  top of the stack",
+              "tone": "muted"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s05",
+      "section": "THE STACK",
+      "kicker": "THE STACK POINTER",
+      "headline": "One register\nmarks the *top*.",
+      "aside": "On x86 and ARM the stack grows down, toward lower addresses.",
+      "keywords": [
+        "pointer"
+      ],
+      "narration": "One register, the stack pointer, marks the top of the stack.",
+      "visual": [
+        {
+          "type": "kv",
+          "cue": "pointer",
+          "title": "THE STACK POINTER",
+          "rows": [
+            {
+              "k": "AArch64",
+              "v": "sp"
+            },
+            {
+              "k": "x86-64",
+              "v": "rsp"
+            },
+            {
+              "k": "sp in main, under gdb",
+              "v": "0xfffffffff9d0",
+              "tone": "accent"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s06",
+      "section": "THE STACK",
+      "kicker": "THE EXAMPLE",
+      "headline": "One small call,\nfollowed all the way.",
+      "narration": "Take a function called area: main passes it 3 and 4, and gets 12.",
+      "visual": [
+        {
+          "type": "code",
+          "cue": "function",
+          "title": "STACK.C",
+          "lang": "text",
+          "code": "int area(int w, int h) {\n  int a = w * h;\n  return a;\n}\n\nint main(void) {\n  int r = area(3, 4);  // 12\n  return r;\n}"
+        }
+      ]
+    },
+    {
+      "id": "s07",
+      "section": "THE STACK",
+      "kicker": "ON THE CALL",
+      "headline": "Each call gets\nits own *frame*.",
+      "aside": "At -O0. An optimizing build keeps all of this in registers.",
+      "keywords": [
+        "frame"
+      ],
+      "narration": "The call pushes a new frame for area, holding its inputs and result.",
+      "visual": [
+        {
+          "type": "kv",
+          "cue": "frame",
+          "title": "AREA'S FRAME · 32 BYTES · GCC -O0",
+          "rows": [
+            {
+              "k": "[sp, 8]",
+              "v": "h = 4"
+            },
+            {
+              "k": "[sp, 12]",
+              "v": "w = 3"
+            },
+            {
+              "k": "[sp, 28]",
+              "v": "a = 12",
+              "tone": "accent"
+            },
+            {
+              "k": "sp",
+              "v": "0xfffffffff9b0",
+              "tone": "muted"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s08",
+      "section": "THE STACK",
+      "kicker": "MORE IN THE FRAME",
+      "headline": "Functions that call\nsave their own way *back*.",
+      "aside": "x86 call pushes the return address. AArch64 bl puts it in x30.",
+      "narration": "Many frames also hold saved registers and a return address.",
+      "visual": [
+        {
+          "type": "code",
+          "cue": "saved",
+          "title": "MAIN'S PROLOGUE · AARCH64",
+          "lang": "text",
+          "code": "// x30: main's own return address;\n// bl area is about to overwrite it\n// x29: the caller's frame pointer\nstp  x29, x30, [sp, -32]!\nmov  x29, sp  // new frame pointer"
+        },
+        {
+          "type": "note",
+          "cue": "registers",
+          "text": "area calls nothing, so it never saves x30"
+        }
+      ]
+    },
+    {
+      "id": "s09",
+      "section": "THE STACK",
+      "kicker": "MAKING ROOM",
+      "headline": "Allocating is\n*one* subtraction.",
+      "narration": "Making room costs one instruction: subtract 32 from the stack pointer.",
+      "visual": [
+        {
+          "type": "code",
+          "cue": "instruction",
+          "title": "AREA · AARCH64 · GCC -O0",
+          "lang": "text",
+          "code": "sub  sp, sp, #32   // make the frame\nstr  w0, [sp, 12]  // w = 3\nstr  w1, [sp, 8]   // h = 4"
+        },
+        {
+          "type": "stat",
+          "cue": "subtract",
+          "value": "1",
+          "label": "instruction to make the frame",
+          "sub": "no search, no bookkeeping"
+        }
+      ]
+    },
+    {
+      "id": "s10",
+      "section": "THE STACK",
+      "kicker": "ON RETURN",
+      "headline": "Return, and the frame\nis released at once.",
+      "narration": "When area returns, it adds the 32 back, which releases the whole frame.",
+      "visual": [
+        {
+          "type": "code",
+          "cue": "adds",
+          "title": "AREA · THE LAST 2 LINES",
+          "lang": "text",
+          "code": "add  sp, sp, 32  // release the frame\nret              // w0 = 12, to main"
+        },
+        {
+          "type": "terminal",
+          "cue": "back",
+          "title": "THE STACK · AFTER THE RETURN",
+          "lines": [
+            {
+              "text": "main's frame",
+              "right": "in use"
+            },
+            {
+              "text": "area's frame",
+              "right": "released",
+              "tone": "muted"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s11",
+      "section": "THE STACK",
+      "kicker": "LAST IN, FIRST OUT",
+      "headline": "Last in,\nfirst *out*.",
+      "narration": "The last function called always returns first, so frames leave in reverse order.",
+      "visual": [
+        {
+          "type": "steps",
+          "cue": "last",
+          "numbered": true,
+          "items": [
+            {
+              "text": "push main",
+              "sub": "the program starts",
+              "state": "done"
+            },
+            {
+              "text": "push area",
+              "sub": "main calls area(3, 4)",
+              "state": "done"
+            },
+            {
+              "text": "pop area",
+              "sub": "returns 12",
+              "state": "active"
+            },
+            {
+              "text": "pop main",
+              "sub": "the program ends",
+              "state": "dim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s12",
+      "section": "THE STACK",
+      "kicker": "THE LIFETIME RULE",
+      "headline": "A local can't\n*outlive* its call.",
+      "narration": "So a local dies with its call. Returning its address is a bug in C.",
+      "visual": [
+        {
+          "type": "code",
+          "cue": "local",
+          "title": "BAD.C",
+          "lang": "text",
+          "code": "int *bad(void) {\n  int x = 5;\n  return &x;\n}"
+        },
+        {
+          "type": "terminal",
+          "cue": "Returning",
+          "title": "GCC SAYS",
+          "lines": [
+            {
+              "text": "warning: function returns address",
+              "tone": "orange"
+            },
+            {
+              "text": "of local variable [-Wreturn-local-addr]",
+              "tone": "orange"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s13",
+      "section": "THE STACK",
+      "kicker": "HOW BIG",
+      "headline": "The stack is\nsmall and *fixed*.",
+      "aside": "Linux sets it with ulimit -s. On Windows, the linker picks it.",
+      "narration": "The stack is also small: 8 megabytes by default on Linux, 1 on Windows.",
+      "visual": [
+        {
+          "type": "terminal",
+          "cue": "small",
+          "title": "LINUX · STACK LIMIT, IN KB",
+          "lines": [
+            {
+              "text": "$ ulimit -s",
+              "tone": "muted"
+            },
+            {
+              "text": "8192",
+              "tone": "accent"
+            }
+          ]
+        },
+        {
+          "type": "kv",
+          "cue": "8",
+          "title": "DEFAULT STACK SIZE",
+          "rows": [
+            {
+              "k": "Linux, main thread",
+              "v": "8 MB"
+            },
+            {
+              "k": "Windows, per thread",
+              "v": "1 MB"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s14",
+      "section": "THE STACK",
+      "kicker": "WHERE THE STACK WINS",
+      "headline": "Where memory must\nnever *surprise* you.",
+      "narration": "Car firmware written to MISRA C avoids malloc, and uses the stack and static buffers.",
+      "visual": [
+        {
+          "type": "card",
+          "cue": "MISRA",
+          "label": "MISRA C:2012 · RULE 21.3",
+          "title": "No malloc, calloc, realloc or free.",
+          "body": "A Required rule, common in automotive code.",
+          "accentBar": true
+        },
+        {
+          "type": "kv",
+          "cue": "malloc",
+          "title": "WHERE ITS MEMORY COMES FROM",
+          "rows": [
+            {
+              "k": "locals",
+              "v": "the stack"
+            },
+            {
+              "k": "buffers",
+              "v": "static, sized at build time"
+            },
+            {
+              "k": "heap",
+              "v": "not used",
+              "tone": "muted"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s15",
+      "section": "THE HEAP",
+      "kicker": "CHAPTER TWO",
+      "headline": "Heap memory outlives\nthe *call*.",
+      "aside": "No relation to the heap data structure. Same word, different thing.",
+      "narration": "The heap is different: its memory isn't tied to any function call.",
+      "visual": [
+        {
+          "type": "kv",
+          "cue": "memory",
+          "title": "WHO DECIDES WHEN IT GOES",
+          "rows": [
+            {
+              "k": "stack memory",
+              "v": "the return"
+            },
+            {
+              "k": "heap memory",
+              "v": "you, or a garbage collector",
+              "tone": "accent"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s16",
+      "section": "THE HEAP",
+      "kicker": "THE ALLOCATOR",
+      "headline": "One library\nkeeps the *books*.",
+      "keywords": [
+        "allocator"
+      ],
+      "narration": "A library, the allocator, tracks which heap bytes are free or taken.",
+      "visual": [
+        {
+          "type": "tiles",
+          "cue": "allocator",
+          "columns": 2,
+          "items": [
+            {
+              "title": "glibc malloc",
+              "sub": "most Linux"
+            },
+            {
+              "title": "jemalloc",
+              "sub": "FreeBSD, Redis"
+            },
+            {
+              "title": "tcmalloc",
+              "sub": "from Google"
+            },
+            {
+              "title": "mimalloc",
+              "sub": "from Microsoft"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s17",
+      "section": "THE HEAP",
+      "kicker": "THE EXAMPLE",
+      "headline": "Memory that must\nsurvive the *return*.",
+      "narration": "Take a function that asks for 3 ints, 12 bytes, and hands them back.",
+      "visual": [
+        {
+          "type": "code",
+          "cue": "function",
+          "title": "HEAP.C",
+          "lang": "text",
+          "code": "int *make_scores(int n) {\n  int *s = malloc(n * sizeof(int));\n  return s;\n}"
+        },
+        {
+          "type": "note",
+          "cue": "3",
+          "text": "make_scores(3): 3 ints × 4 bytes = 12"
+        }
+      ]
+    },
+    {
+      "id": "s18",
+      "section": "THE HEAP",
+      "kicker": "ON MALLOC",
+      "headline": "malloc hands back\nan *address*.",
+      "narration": "malloc finds room for those 12 bytes and returns their address.",
+      "visual": [
+        {
+          "type": "terminal",
+          "title": "MAKE_SCORES(3) · AARCH64",
+          "lines": [
+            {
+              "text": "malloc(12)",
+              "right": "0xaaaaaaab22a0",
+              "tone": "accent"
+            }
+          ]
+        },
+        {
+          "type": "kv",
+          "cue": "12",
+          "title": "WHAT GLIBC SETS ASIDE",
+          "rows": [
+            {
+              "k": "asked for",
+              "v": "12 bytes"
+            },
+            {
+              "k": "usable",
+              "v": "24 bytes"
+            },
+            {
+              "k": "chunk",
+              "v": "32 bytes, 8 of them header",
+              "tone": "accent"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s19",
+      "section": "THE HEAP",
+      "kicker": "TWO PLACES AT ONCE",
+      "headline": "The pointer is on the stack.\nThe bytes are *not*.",
+      "layout": "full",
+      "narration": "The pointer itself is a stack local. The 12 bytes are on the heap.",
+      "visual": [
+        {
+          "type": "row",
+          "cue": "pointer",
+          "blocks": [
+            {
+              "type": "terminal",
+              "title": "STACK · MAKE_SCORES' FRAME",
+              "lines": [
+                {
+                  "text": "s",
+                  "right": "0xaaaaaaab22a0"
+                },
+                {
+                  "text": "at 0xfffffffff9c8",
+                  "tone": "muted"
+                }
+              ]
+            },
+            {
+              "type": "terminal",
+              "title": "HEAP",
+              "lines": [
+                {
+                  "text": "0xaaaaaaab22a0",
+                  "right": "12 bytes",
+                  "tone": "accent"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s20",
+      "section": "THE HEAP",
+      "kicker": "FINDING ROOM",
+      "headline": "Finding room\nmeans a *search*.",
+      "narration": "Finding room means searching free lists, grouped by size, for a chunk that fits.",
+      "visual": [
+        {
+          "type": "kv",
+          "cue": "lists",
+          "title": "GLIBC'S FREE LISTS, CALLED BINS",
+          "rows": [
+            {
+              "k": "tcache",
+              "v": "per thread, no lock"
+            },
+            {
+              "k": "small bins",
+              "v": "one exact size each"
+            },
+            {
+              "k": "large bins",
+              "v": "size ranges, best fit"
+            },
+            {
+              "k": "unsorted bin",
+              "v": "just-freed chunks"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s21",
+      "section": "THE HEAP",
+      "kicker": "WHEN NOTHING FITS",
+      "headline": "Out of room?\nAsk the *kernel*.",
+      "aside": "By default, 128 KiB and up goes to mmap. The threshold can rise.",
+      "narration": "When nothing fits, it asks the kernel for more, with brk or mmap.",
+      "visual": [
+        {
+          "type": "terminal",
+          "cue": "kernel",
+          "title": "HEAP GROWTH · AARCH64 · ASLR OFF",
+          "lines": [
+            {
+              "text": "$ setarch -R strace -e trace=brk ./heap",
+              "tone": "muted"
+            },
+            {
+              "text": "brk(NULL) = 0xaaaaaaab2000",
+              "tone": "muted"
+            },
+            {
+              "text": "brk(NULL) = 0xaaaaaaab2000",
+              "tone": "muted"
+            },
+            {
+              "text": "brk(0xaaaaaaad3000) = 0xaaaaaaad3000",
+              "tone": "accent"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s22",
+      "section": "THE HEAP",
+      "kicker": "ON RETURN",
+      "headline": "The data outlives\nthe function that *made* it.",
+      "narration": "Now the function can return, and its caller still has the 12 bytes.",
+      "visual": [
+        {
+          "type": "code",
+          "cue": "return",
+          "title": "HEAP.C · MAIN",
+          "lang": "text",
+          "code": "int *s = make_scores(3);\ns[0] = 90;   // fine: still allocated"
+        },
+        {
+          "type": "kv",
+          "cue": "caller",
+          "title": "AFTER MAKE_SCORES RETURNS",
+          "rows": [
+            {
+              "k": "its stack frame",
+              "v": "released",
+              "tone": "muted"
+            },
+            {
+              "k": "the 12 bytes at 0x…22a0",
+              "v": "still taken",
+              "tone": "accent"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s23",
+      "section": "THE HEAP",
+      "kicker": "FREEING",
+      "headline": "Nothing is freed\nuntil you *say* so.",
+      "narration": "Any function can free the 12 bytes, in any order. Until then, they stay taken.",
+      "visual": [
+        {
+          "type": "code",
+          "cue": "free",
+          "title": "HEAP.C · MAIN, LATER",
+          "lang": "text",
+          "code": "free(s);  // chunk 0x…22a0 goes back\n          // on a free list"
+        }
+      ]
+    },
+    {
+      "id": "s24",
+      "section": "THE HEAP",
+      "kicker": "NEW",
+      "headline": "new is the same idea,\nplus a *constructor*.",
+      "narration": "In C++ and Java, the new keyword allocates on the heap, then runs a constructor.",
+      "visual": [
+        {
+          "type": "code",
+          "cue": "new",
+          "title": "C++ AND JAVA",
+          "lang": "text",
+          "code": "// C++\nPoint *p = new Point(3, 4);\ndelete p;\n\n// Java\nPoint q = new Point(3, 4);\n// no delete: the GC frees it"
+        }
+      ]
+    },
+    {
+      "id": "s25",
+      "section": "THE HEAP",
+      "kicker": "FRAGMENTATION",
+      "headline": "Free space ends up\nin *pieces*.",
+      "keywords": [
+        "fragmentation"
+      ],
+      "narration": "Freeing in any order can cause fragmentation: free space split into holes.",
+      "visual": [
+        {
+          "type": "segments",
+          "cue": "fragmentation",
+          "items": [
+            {
+              "text": "used",
+              "tone": "beige"
+            },
+            {
+              "text": "free",
+              "tone": "mint"
+            },
+            {
+              "text": "used",
+              "tone": "beige"
+            },
+            {
+              "text": "free",
+              "tone": "mint"
+            },
+            {
+              "text": "used",
+              "tone": "beige"
+            },
+            {
+              "text": "free",
+              "tone": "mint"
+            }
+          ],
+          "caption": "plenty free, all in holes"
+        }
+      ]
+    },
+    {
+      "id": "s26",
+      "section": "THE HEAP",
+      "kicker": "A WORKED EXAMPLE",
+      "headline": "32 bytes free,\nin *two* holes.",
+      "narration": "Say 4 chunks of 16 bytes. Free the first and third: 32 bytes free.",
+      "visual": [
+        {
+          "type": "segments",
+          "items": [
+            {
+              "text": "A · 16",
+              "tone": "beige"
+            },
+            {
+              "text": "B · 16",
+              "tone": "beige"
+            },
+            {
+              "text": "C · 16",
+              "tone": "beige"
+            },
+            {
+              "text": "D · 16",
+              "tone": "beige"
+            }
+          ],
+          "caption": "before"
+        },
+        {
+          "type": "segments",
+          "cue": "Free",
+          "items": [
+            {
+              "text": "free",
+              "tone": "mint"
+            },
+            {
+              "text": "B · 16",
+              "tone": "beige"
+            },
+            {
+              "text": "free",
+              "tone": "mint"
+            },
+            {
+              "text": "D · 16",
+              "tone": "beige"
+            }
+          ],
+          "caption": "after free(A), free(C) · simplified, no headers"
+        }
+      ]
+    },
+    {
+      "id": "s27",
+      "section": "THE HEAP",
+      "kicker": "NO FIT",
+      "headline": "Enough memory,\nno place to *put* it.",
+      "aside": "Allocators can merge neighbouring free chunks. B sits between these.",
+      "narration": "But no hole is bigger than 16, so a 32-byte request can't use them.",
+      "visual": [
+        {
+          "type": "terminal",
+          "cue": "hole",
+          "title": "MALLOC(32)",
+          "lines": [
+            {
+              "text": "hole A",
+              "right": "16 bytes, too small"
+            },
+            {
+              "text": "hole C",
+              "right": "16 bytes, too small"
+            },
+            {
+              "text": "result",
+              "right": "new space past D",
+              "tone": "orange"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s28",
+      "section": "THE HEAP",
+      "kicker": "WHERE IT BITES",
+      "headline": "Allocators get picked\nfor *fragmentation*.",
+      "narration": "Redis made jemalloc its Linux default, because it fragments less than glibc malloc.",
+      "visual": [
+        {
+          "type": "card",
+          "label": "REDIS README",
+          "title": "jemalloc, by default on Linux",
+          "body": "“Fewer fragmentation problems than libc malloc.”",
+          "accentBar": true
+        },
+        {
+          "type": "kv",
+          "cue": "jemalloc",
+          "title": "REDIS · INFO MEMORY",
+          "rows": [
+            {
+              "k": "mem_fragmentation_ratio",
+              "v": "RSS ÷ used memory"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s29",
+      "section": "THE PRICE OF THE HEAP",
+      "kicker": "THE TURN",
+      "headline": "Freedom\nhas a *price*.",
+      "theme": "dark",
+      "narrator": "big",
+      "narration": "But the heap's freedom has a price, and you pay it in speed.",
+      "visual": [
+        {
+          "type": "card",
+          "cue": "freedom",
+          "label": "WHAT IT BUYS",
+          "title": "Any size, any lifetime.",
+          "body": "Memory that outlives the call."
+        },
+        {
+          "type": "card",
+          "cue": "price",
+          "label": "WHAT IT COSTS",
+          "title": "Speed.",
+          "body": "Slower to get, often slower to reach.",
+          "accentBar": true
+        }
+      ]
+    },
+    {
+      "id": "s30",
+      "section": "THE PRICE OF THE HEAP",
+      "kicker": "SLOWER TO GET",
+      "headline": "One instruction,\nversus a *search*.",
+      "theme": "dark",
+      "narration": "A stack allocation is one subtraction. malloc searches lists, and sometimes calls the kernel.",
+      "visual": [
+        {
+          "type": "terminal",
+          "title": "STACK",
+          "lines": [
+            {
+              "text": "sub  sp, sp, #32",
+              "right": "done",
+              "tone": "teal"
+            }
+          ]
+        },
+        {
+          "type": "terminal",
+          "cue": "malloc",
+          "title": "HEAP · MALLOC(12)",
+          "lines": [
+            {
+              "text": "check this thread's cache"
+            },
+            {
+              "text": "search the bins"
+            },
+            {
+              "text": "else brk or mmap",
+              "right": "system call",
+              "tone": "orange"
+            }
+          ]
+        },
+        {
+          "type": "stat",
+          "cue": "lists",
+          "value": "15 ns",
+          "label": "per malloc(12) + free, best case",
+          "sub": "a tcache hit · AArch64 · glibc 2.35 · -O2"
+        }
+      ]
+    },
+    {
+      "id": "s31",
+      "section": "THE PRICE OF THE HEAP",
+      "kicker": "SLOWER TO REACH",
+      "headline": "Scattered objects\n*miss* the cache.",
+      "aside": "The top of the stack is used constantly, so it stays in cache.",
+      "keywords": [
+        "cache"
+      ],
+      "narration": "Following pointers between heap objects can miss the cache when they sit far apart.",
+      "visual": [
+        {
+          "type": "meter",
+          "cue": "pointers",
+          "label": "L1 CACHE HIT",
+          "value": 0.01,
+          "right": "≈ 1 ns",
+          "tone": "mint"
+        },
+        {
+          "type": "meter",
+          "cue": "miss",
+          "label": "MAIN MEMORY, MISSING EVERY CACHE",
+          "value": 1,
+          "right": "≈ 100 ns",
+          "tone": "accent"
+        }
+      ]
+    },
+    {
+      "id": "s32",
+      "section": "THE PRICE OF THE HEAP",
+      "kicker": "FIX ONE",
+      "headline": "Allocate by\nbumping a *pointer*.",
+      "keywords": [
+        "arena"
+      ],
+      "narration": "The first fix is an arena: one big block, handed out in order.",
+      "visual": [
+        {
+          "type": "segments",
+          "cue": "arena",
+          "items": [
+            {
+              "text": "a",
+              "tone": "accent",
+              "flex": 1
+            },
+            {
+              "text": "b",
+              "tone": "accent",
+              "flex": 2
+            },
+            {
+              "text": "c",
+              "tone": "accent",
+              "flex": 1
+            },
+            {
+              "text": "free →",
+              "tone": "beige",
+              "flex": 4
+            }
+          ],
+          "caption": "one block, carved front to back"
+        },
+        {
+          "type": "code",
+          "cue": "block",
+          "title": "ARENA ALLOC",
+          "lang": "text",
+          "code": "size = align(size, 16);\nvoid *p = next;\nnext += size;\nreturn p;"
+        }
+      ]
+    },
+    {
+      "id": "s33",
+      "section": "THE PRICE OF THE HEAP",
+      "kicker": "THE CATCH",
+      "headline": "Everything in it\ndies *together*.",
+      "narration": "The catch: you can't free one piece. The whole arena goes at once.",
+      "visual": [
+        {
+          "type": "terminal",
+          "cue": "free",
+          "title": "ARENA",
+          "lines": [
+            {
+              "text": "free(b)",
+              "right": "not possible",
+              "tone": "muted"
+            },
+            {
+              "text": "reset the arena",
+              "right": "a, b, c all gone",
+              "tone": "orange"
+            }
+          ]
+        },
+        {
+          "type": "card",
+          "cue": "whole",
+          "label": "APACHE HTTPD",
+          "title": "One pool per request",
+          "body": "Freed all at once when the request ends."
+        }
+      ]
+    },
+    {
+      "id": "s34",
+      "section": "THE PRICE OF THE HEAP",
+      "kicker": "FIX TWO",
+      "headline": "Keep the data\n*together*.",
+      "aside": "The cost: growing the array can mean copying all of it.",
+      "narration": "The second fix is layout: keep values side by side in one array.",
+      "visual": [
+        {
+          "type": "compare",
+          "cue": "layout",
+          "left": {
+            "label": "LINKED LIST",
+            "title": "Nodes all over the heap",
+            "body": "Every step follows a pointer.",
+            "tone": "beige"
+          },
+          "right": {
+            "label": "ARRAY",
+            "title": "One block, in order",
+            "body": "Neighbours share a cache line.",
+            "tone": "mint"
+          }
+        }
+      ]
+    },
+    {
+      "id": "s35",
+      "section": "THE PRICE OF THE HEAP",
+      "kicker": "FIX THREE",
+      "headline": "Some objects never\n*reach* the heap.",
+      "aside": "It works only when the compiler can prove the object stays local.",
+      "keywords": [
+        "escape"
+      ],
+      "narration": "Compilers help too: escape analysis keeps some objects off the heap.",
+      "visual": [
+        {
+          "type": "code",
+          "title": "P.GO · THE WHOLE FILE",
+          "lang": "text",
+          "code": "package p\ntype point struct{ x, y int }\nfunc sum() int {\n  p := &point{3, 4}\n  return p.x + p.y\n}\nfunc leak() *point {\n  p := &point{3, 4}\n  return p\n}"
+        },
+        {
+          "type": "terminal",
+          "cue": "escape",
+          "title": "GO 1.26 ESCAPE ANALYSIS · EXCERPT",
+          "lines": [
+            {
+              "text": "$ go build -gcflags=-m",
+              "tone": "muted"
+            },
+            {
+              "text": "./p.go:4:8: &point{...} does not escape",
+              "tone": "teal"
+            },
+            {
+              "text": "./p.go:8:8: &point{...} escapes to heap",
+              "tone": "orange"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s36",
+      "section": "WHEN IT GOES WRONG",
+      "kicker": "STACK OVERFLOW",
+      "headline": "No base case,\nno stack *left*.",
+      "aside": "In Java, the same mistake throws a StackOverflowError.",
+      "narration": "The stack fails at once: recurse with no base case, and 8 megabytes run out.",
+      "visual": [
+        {
+          "type": "code",
+          "cue": "Recurse",
+          "title": "REC.C",
+          "lang": "text",
+          "code": "int f(int n) { return f(n + 1) + 1; }\nint main(void) { return f(0); }"
+        },
+        {
+          "type": "terminal",
+          "cue": "base",
+          "title": "AARCH64 · GCC -O0",
+          "lines": [
+            {
+              "text": "$ ./rec",
+              "tone": "muted"
+            },
+            {
+              "text": "Segmentation fault (core dumped)",
+              "tone": "orange"
+            }
+          ]
+        },
+        {
+          "type": "note",
+          "cue": "case",
+          "text": "8 MB ÷ 32-byte frames ≈ 262,000 calls"
+        }
+      ]
+    },
+    {
+      "id": "s37",
+      "section": "WHEN IT GOES WRONG",
+      "kicker": "MEMORY LEAK",
+      "headline": "Nothing frees it,\nso it *stays*.",
+      "keywords": [
+        "leak"
+      ],
+      "narration": "The heap fails slowly: skip the free, and those bytes leak until the process exits.",
+      "visual": [
+        {
+          "type": "code",
+          "cue": "skip",
+          "title": "HANDLER.C",
+          "lang": "text",
+          "code": "void handle(void) {\n  char *buf = malloc(1000);\n  // … no free(buf)\n}"
+        },
+        {
+          "type": "kv",
+          "cue": "bytes",
+          "title": "EACH CALL",
+          "rows": [
+            {
+              "k": "allocated",
+              "v": "1000 bytes"
+            },
+            {
+              "k": "freed",
+              "v": "0 bytes",
+              "tone": "orange"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s38",
+      "section": "WHEN IT GOES WRONG",
+      "kicker": "THE MATH",
+      "headline": "Small leaks, times\n*every* request.",
+      "narration": "Leak 1 kilobyte a request at 1,000 requests a second: 3.6 gigabytes an hour.",
+      "visual": [
+        {
+          "type": "kv",
+          "cue": "Leak",
+          "title": "THE LEAK RATE",
+          "rows": [
+            {
+              "k": "per request",
+              "v": "1 KB"
+            },
+            {
+              "k": "requests",
+              "v": "1,000 a second"
+            },
+            {
+              "k": "leaked",
+              "v": "1 MB a second",
+              "tone": "accent"
+            }
+          ]
+        },
+        {
+          "type": "terminal",
+          "cue": "1,000",
+          "title": "MEMORY OF A LEAKING SERVER",
+          "lines": [
+            {
+              "text": "after 1 minute",
+              "right": "60 MB"
+            },
+            {
+              "text": "after 10 minutes",
+              "right": "600 MB"
+            },
+            {
+              "text": "after 1 hour",
+              "right": "3.6 GB",
+              "tone": "orange"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s39",
+      "section": "WHEN IT GOES WRONG",
+      "kicker": "GARBAGE COLLECTED, TOO",
+      "headline": "Reachable forever\nmeans kept *forever*.",
+      "aside": "A collector frees what nothing can reach. A cache can still reach it.",
+      "narration": "Garbage collection doesn't prevent this. A cache that only grows still leaks.",
+      "visual": [
+        {
+          "type": "code",
+          "cue": "cache",
+          "title": "JAVA",
+          "lang": "text",
+          "code": "static Map<String, byte[]> cache =\n    new HashMap<>();\n\ncache.put(id, data); // never removed"
+        }
+      ]
+    },
+    {
+      "id": "s40",
+      "section": "THE PRACTICAL SPLIT",
+      "kicker": "CHOOSING",
+      "headline": "The practical split.",
+      "theme": "accent",
+      "narrator": "big",
+      "narration": "So the practical split comes down to size and lifetime."
+    },
+    {
+      "id": "s41",
+      "section": "THE PRACTICAL SPLIT",
+      "kicker": "PICK THE STACK WHEN",
+      "headline": "Small, fixed,\nand *short-lived*.",
+      "narration": "Use the stack for small, fixed-size values that die with the function.",
+      "visual": [
+        {
+          "type": "checklist",
+          "cue": "small",
+          "items": [
+            {
+              "text": "size known at compile time",
+              "checked": true
+            },
+            {
+              "text": "bytes to kilobytes, not megabytes",
+              "checked": true
+            },
+            {
+              "text": "not needed after the return",
+              "checked": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s42",
+      "section": "THE PRACTICAL SPLIT",
+      "kicker": "PICK THE HEAP WHEN",
+      "headline": "Long-lived, growing,\nor *big*.",
+      "narration": "Use the heap when data outlives the call, grows at runtime, or is large.",
+      "visual": [
+        {
+          "type": "card",
+          "cue": "outlives",
+          "label": "OUTLIVES THE CALL",
+          "title": "Lives past the return.",
+          "body": "Returned by pointer, stored, or shared between threads."
+        },
+        {
+          "type": "card",
+          "cue": "grows",
+          "label": "GROWS OR IS LARGE",
+          "title": "Sized only at runtime.",
+          "body": "Or too big for an 8 MB stack.",
+          "accentBar": true
+        }
+      ]
+    },
+    {
+      "id": "s43",
+      "section": "THE PRACTICAL SPLIT",
+      "kicker": "BOTH AT ONCE",
+      "headline": "The handle on the stack,\nthe data on the heap.",
+      "layout": "full",
+      "narration": "Most code uses both: a vector on the stack, its elements on the heap.",
+      "visual": [
+        {
+          "type": "row",
+          "cue": "vector",
+          "blocks": [
+            {
+              "type": "terminal",
+              "title": "STACK · IN MAIN · AARCH64",
+              "lines": [
+                {
+                  "text": "std::vector<int> v(1000);"
+                },
+                {
+                  "text": "sizeof(v)",
+                  "right": "24 bytes"
+                }
+              ]
+            },
+            {
+              "type": "terminal",
+              "title": "HEAP",
+              "lines": [
+                {
+                  "text": "1000 ints",
+                  "right": "4000 bytes",
+                  "tone": "accent"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s44",
+      "section": "THE PRACTICAL SPLIT",
+      "kicker": "IN ONE LINE",
+      "headline": "Fast but brief,\nor lasting but *slower*.",
+      "narration": "The stack is fast but brief. The heap lasts, and costs you speed.",
+      "visual": [
+        {
+          "type": "card",
+          "cue": "stack",
+          "label": "STACK",
+          "title": "Fast, and gone on return."
+        },
+        {
+          "type": "card",
+          "cue": "heap",
+          "label": "HEAP",
+          "title": "Lasts as long as you need, at a price.",
+          "accentBar": true
+        }
+      ]
+    }
+  ]
+}

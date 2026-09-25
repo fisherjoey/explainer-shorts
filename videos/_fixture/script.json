@@ -1,0 +1,433 @@
+{
+  "slug": "_fixture",
+  "title": "Sessions and JWT (fixture)",
+  "pronounce": {
+    "HttpOnly": "HTTP only"
+  },
+  "slides": [
+    {
+      "id": "s01",
+      "section": "KEEPING A USER LOGGED IN",
+      "kicker": "THE SHARED JOB",
+      "headline": "Every request has to ask\nthe same *question*: who is this?",
+      "theme": "light",
+      "layout": "split",
+      "narrator": "idle",
+      "aside": "Both JWT and sessions solve this. They just store the answer in very different places.",
+      "keywords": [
+        "question"
+      ],
+      "narration": "Two ways to keep a user logged in: sessions and JWT.",
+      "visual": [
+        {
+          "type": "steps",
+          "numbered": true,
+          "items": [
+            {
+              "text": "Browser sends a request",
+              "state": "done"
+            },
+            {
+              "text": "Server asks: who is this?",
+              "state": "active"
+            },
+            {
+              "text": "Server answers with identity",
+              "state": "dim"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s02",
+      "section": "JWT",
+      "kicker": "SEGMENT ONE",
+      "headline": "The header says how\nthe token was signed.",
+      "layout": "split",
+      "narrator": "idle",
+      "keywords": [
+        "header"
+      ],
+      "narration": "a header naming the algorithm that signed it,",
+      "visual": [
+        {
+          "type": "segments",
+          "items": [
+            {
+              "text": "header",
+              "tone": "accent",
+              "flex": 1
+            },
+            {
+              "text": "payload",
+              "tone": "mint",
+              "flex": 2
+            },
+            {
+              "text": "signature",
+              "tone": "peach",
+              "flex": 1
+            }
+          ]
+        },
+        {
+          "type": "note",
+          "text": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+        },
+        {
+          "type": "arrow",
+          "direction": "down"
+        },
+        {
+          "type": "code",
+          "title": "DECODED HEADER",
+          "lang": "json",
+          "code": "{\n  \"alg\": \"HS256\",\n  \"typ\": \"JWT\"\n}"
+        }
+      ]
+    },
+    {
+      "id": "s03",
+      "section": "SESSION AUTH",
+      "kicker": "CHAPTER ONE",
+      "headline": "Session auth is\n*stateful*.",
+      "emphasis": true,
+      "layout": "split",
+      "narrator": "look",
+      "keywords": [
+        "stateful"
+      ],
+      "narration": "Session authentication keeps state on the server.",
+      "visual": [
+        {
+          "type": "terminal",
+          "title": "SERVER · SESSION STORE",
+          "lines": [
+            {
+              "text": "state the server is holding for you"
+            },
+            {
+              "text": "session 8f4a2c9e",
+              "right": "user 1481",
+              "tone": "accent"
+            },
+            {
+              "text": "logged in at",
+              "right": "09:41",
+              "tone": "muted"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s04",
+      "section": "SESSION AUTH",
+      "kicker": "WHERE THE RECORD LIVES",
+      "headline": "Anywhere the server can reach—\nmemory, a database, or Redis.",
+      "layout": "split",
+      "narrator": "idle",
+      "narration": "At login, the server writes a session record and keeps it in memory, a database, or a shared store such as Redis when several servers need it.",
+      "visual": [
+        {
+          "type": "chips",
+          "items": [
+            {
+              "text": "memory",
+              "tone": "beige"
+            },
+            {
+              "text": "database",
+              "tone": "beige"
+            },
+            {
+              "text": "Redis",
+              "tone": "accent"
+            }
+          ]
+        },
+        {
+          "type": "card",
+          "label": "RUNNING MORE THAN ONE SERVER?",
+          "title": "one shared store",
+          "body": "every server reads the same rows",
+          "accentBar": true
+        }
+      ]
+    },
+    {
+      "id": "s05",
+      "section": "SESSION AUTH",
+      "kicker": "ONE FLAG ON THE COOKIE",
+      "headline": "HttpOnly: the browser sends it,\nscripts can't touch it.",
+      "layout": "split",
+      "narrator": "idle",
+      "keywords": [
+        "HttpOnly"
+      ],
+      "narration": "The cookie is usually marked HttpOnly, so page scripts cannot read its value.",
+      "visual": [
+        {
+          "type": "kv",
+          "title": "app.example.com",
+          "rows": [
+            {
+              "k": "NAME",
+              "v": "sid"
+            },
+            {
+              "k": "VALUE",
+              "v": "8f4a2c9e1b7d",
+              "tone": "accent"
+            },
+            {
+              "k": "HTTPONLY",
+              "v": "✓"
+            },
+            {
+              "k": "SECURE",
+              "v": "✓"
+            }
+          ]
+        },
+        {
+          "type": "meter",
+          "label": "EXPOSURE TO CROSS-SITE SCRIPTING",
+          "value": 0.15,
+          "right": "LOW",
+          "tone": "mint"
+        }
+      ]
+    },
+    {
+      "id": "s06",
+      "section": "THE COST OF STATELESSNESS",
+      "kicker": "THE TURN",
+      "headline": "No state,\nno off *switch*.",
+      "theme": "dark",
+      "emphasis": true,
+      "layout": "split",
+      "narrator": "big",
+      "narration": "Going stateless has a cost.",
+      "visual": [
+        {
+          "type": "compare",
+          "left": {
+            "label": "WHAT IT BUYS",
+            "title": "Scale.",
+            "body": "Any node verifies alone. No shared secret to keep alive.",
+            "tone": "mint"
+          },
+          "right": {
+            "label": "WHAT IT COSTS",
+            "title": "Revocation.",
+            "body": "Taking a token back is suddenly the hard part.",
+            "tone": "peach"
+          },
+          "caption": "the same property, read twice"
+        }
+      ]
+    },
+    {
+      "id": "s07",
+      "section": "THE COST OF STATELESSNESS",
+      "kicker": "THE WORKAROUNDS",
+      "headline": "So you shrink the window\nthe token is dangerous in.",
+      "layout": "split",
+      "narrator": "idle",
+      "narration": "The usual fixes: short-lived tokens, a refresh token, or a list of revoked tokens.",
+      "visual": [
+        {
+          "type": "checklist",
+          "items": [
+            {
+              "text": "keep the token short-lived",
+              "checked": true
+            },
+            {
+              "text": "add a refresh token",
+              "checked": true
+            },
+            {
+              "text": "keep a block list",
+              "checked": false
+            }
+          ]
+        },
+        {
+          "type": "stat",
+          "value": "5min",
+          "label": "typical short-lived token TTL",
+          "sub": "vs. hours for a session"
+        }
+      ]
+    },
+    {
+      "id": "s08",
+      "section": "WHERE THE CREDENTIAL LIVES",
+      "kicker": "OPTION B, UNDER ATTACK",
+      "headline": "Local storage is just\na box any script can open.",
+      "layout": "split",
+      "narrator": "look",
+      "narration": "Local storage is just a box any script can open, unlike an HttpOnly cookie the browser won't hand to JavaScript.",
+      "visual": [
+        {
+          "type": "row",
+          "blocks": [
+            {
+              "type": "kv",
+              "rows": [
+                {
+                  "k": "app.example.com · local storage · token",
+                  "v": ""
+                }
+              ]
+            },
+            {
+              "type": "terminal",
+              "title": "INJECTED SCRIPT",
+              "lines": [
+                {
+                  "text": "const stolen ="
+                },
+                {
+                  "text": "localStorage.getItem('token');",
+                  "tone": "accent"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s09",
+      "section": "THE PRACTICAL SPLIT",
+      "kicker": "PICK SESSIONS WHEN",
+      "headline": "One application,\none place to say \"no\".",
+      "layout": "full",
+      "narrator": "idle",
+      "narration": "Pick sessions when there is one application and one place that needs to say no.",
+      "visual": [
+        {
+          "type": "tiles",
+          "columns": 2,
+          "items": [
+            {
+              "title": "web",
+              "sub": "one app"
+            },
+            {
+              "title": "api",
+              "sub": "same store"
+            },
+            {
+              "title": "admin",
+              "sub": "instant revoke"
+            },
+            {
+              "title": "jobs",
+              "sub": "same store"
+            }
+          ]
+        },
+        {
+          "type": "browser",
+          "url": "app.example.com/login",
+          "rows": [
+            {
+              "label": "POST",
+              "text": "/login",
+              "tag": "200"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s10",
+      "section": "SEGMENT THREE",
+      "kicker": "ON EVERY REQUEST",
+      "headline": "The *token* rides along.",
+      "theme": "accent",
+      "layout": "full",
+      "narrator": "hidden",
+      "keywords": [
+        "token"
+      ],
+      "narration": "The token rides in a header, the client has to attach it.",
+      "visual": [
+        {
+          "type": "note",
+          "text": "Authorization: Bearer <token>"
+        }
+      ]
+    },
+    {
+      "id": "s11",
+      "section": "THE TRADE, IN ONE LINE",
+      "kicker": "NO LOOKUP, JUST MATHS",
+      "headline": "Sessions hand you an off switch.\nJWT makes you *build* one.",
+      "layout": "split",
+      "narrator": "look",
+      "aside": "Sessions ask you to run a store. JWT asks you to build your own off switch.",
+      "narration": "Sessions hand the server the off switch and ask you to run a store. JWT hands you the off switch and asks you to build it.",
+      "visual": [
+        {
+          "type": "arrow",
+          "label": "trade-off",
+          "direction": "right"
+        }
+      ]
+    },
+    {
+      "id": "s12",
+      "section": "THE TRADE, IN ONE LINE",
+      "kicker": "PICK THE PROBLEM",
+      "headline": "Pick the problem\nyou would rather have.",
+      "layout": "full",
+      "narrator": "look",
+      "narration": "So pick the problem you would rather have.",
+      "visual": [
+        {
+          "type": "card",
+          "title": "So — is that trade worth it?",
+          "body": "There is no universally right answer, only the shape of the failure you are willing to own."
+        }
+      ]
+    },
+    {
+      "id": "s13",
+      "section": "THE TRADE, IN ONE LINE",
+      "kicker": "TWO PANELS, ONE COLUMN",
+      "headline": "Panels share the column,\nshort cards keep their size.",
+      "narration": "Two panels stretch to share the column, and a one-line card keeps its height.",
+      "visual": [
+        {
+          "type": "terminal",
+          "title": "SERVER · SESSION STORE",
+          "lines": [
+            {
+              "text": "session 8f4a2c9e",
+              "right": "user 1481",
+              "tone": "accent"
+            }
+          ]
+        },
+        {
+          "type": "card",
+          "label": "SESSIONS",
+          "title": "Run a store.",
+          "body": "Delete one row, and that login is over."
+        },
+        {
+          "type": "card",
+          "label": "JWT",
+          "title": "Skip the store, build the switch.",
+          "accentBar": true
+        }
+      ]
+    }
+  ]
+}

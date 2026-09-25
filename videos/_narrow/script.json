@@ -1,0 +1,217 @@
+{
+  "slug": "_narrow",
+  "title": "Narrow-width block check: every block at 482 (big-narrator column), 314 (half row) and 235 (half row in the big-narrator column)",
+  "slides": [
+    {
+      "id": "s01", "section": "NARROW · 482", "kicker": "BIG-NARRATOR COLUMN", "headline": "Segments, arrow, stat\nat 482 px.",
+      "layout": "split", "narrator": "big", "narration": "narrow check one",
+      "visual": [
+        {"type": "segments", "items": [{"text": "header", "tone": "accent", "flex": 1}, {"text": "payload", "tone": "mint", "flex": 2}, {"text": "signature", "tone": "peach", "flex": 1}], "caption": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"},
+        {"type": "arrow", "direction": "down", "label": "decoded with base64url"},
+        {"type": "stat", "value": "$12,480", "label": "balance after transfer", "sub": "available now"},
+        {"type": "arrow", "direction": "right", "label": "the round trip session auth needs"}
+      ]
+    },
+    {
+      "id": "s02", "section": "NARROW · 482", "kicker": "BIG-NARRATOR COLUMN", "headline": "Compare and kv\nat 482 px.",
+      "layout": "split", "narrator": "big", "narration": "narrow check two",
+      "visual": [
+        {"type": "compare", "left": {"label": "WHAT IT BUYS", "title": "Scale.", "body": "Any node verifies alone."}, "right": {"label": "WHAT IT COSTS", "title": "Revocation.", "body": "Taking a token back is suddenly the hard part."}, "caption": "the same property, read twice"},
+        {"type": "kv", "title": "app.example.com", "rows": [{"k": "NAME", "v": "sid"}, {"k": "VALUE", "v": "8f4a2c9e1b7d", "tone": "accent"}, {"k": "EXPIRES", "v": "Thu, 01 Jan 2026"}]}
+      ]
+    },
+    {
+      "id": "s03", "section": "NARROW · 482", "kicker": "BIG-NARRATOR COLUMN", "headline": "Tiles, terminal, code\nat 482 px.",
+      "layout": "split", "narrator": "big", "narration": "narrow check three",
+      "visual": [
+        {"type": "tiles", "items": [{"title": "gateway", "sub": "routes traffic"}, {"title": "orders", "sub": "reads /orders"}, {"title": "payments", "sub": "charges cards"}, {"title": "search", "sub": "indexes items"}]},
+        {"type": "terminal", "title": "SERVER · SESSION STORE", "lines": [{"text": "state the server is holding for you"}, {"text": "session 8f4a2c9e", "right": "user 1481"}, {"text": "logged in at", "right": "09:41", "tag": "now"}]}
+      ]
+    },
+    {
+      "id": "s04", "section": "NARROW · 482", "kicker": "BIG-NARRATOR COLUMN", "headline": "Browser, checklist, chips\nat 482 px.",
+      "layout": "split", "narrator": "big", "narration": "narrow check four",
+      "visual": [
+        {"type": "browser", "url": "app.example.com/account/settings/security", "rows": [{"label": "POST", "text": "/login", "tag": "200"}, {"text": "browser · cookie jar holds sid"}]},
+        {"type": "checklist", "items": [{"text": "signature checks out", "sub": "re-signed with the key, byte for byte", "checked": true}, {"text": "exp has not passed", "checked": false}]},
+        {"type": "chips", "items": [{"text": "Authorization-header"}, {"text": "cookie", "tone": "accent"}, {"text": "localStorage", "tone": "mint"}]}
+      ]
+    },
+    {
+      "id": "s05", "section": "NARROW · 482", "kicker": "BIG-NARRATOR COLUMN", "headline": "Steps, card, meter, note\nat 482 px.",
+      "layout": "split", "narrator": "big", "narration": "narrow check five",
+      "visual": [
+        {"type": "steps", "items": [{"text": "a user asks a question", "sub": "one request", "state": "active"}, {"text": "search the vector database", "state": "dim"}]},
+        {"type": "card", "label": "RUNNING MORE THAN ONE SERVER?", "title": "one shared store", "body": "every server reads the same rows", "accentBar": true},
+        {"type": "meter", "label": "EXPOSURE TO CROSS-SITE SCRIPTING", "value": 0.8, "right": "HIGH"},
+        {"type": "note", "text": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNDgxIn0"}
+      ]
+    },
+    {
+      "id": "s06", "section": "NARROW · 314", "kicker": "HALF ROW", "headline": "Segments, stat, arrows\nat 314 px.",
+      "layout": "split", "narrator": "idle", "narration": "narrow check six",
+      "visual": [
+        {"type": "row", "blocks": [
+          {"type": "segments", "items": [{"text": "header", "tone": "accent", "flex": 1}, {"text": "payload", "tone": "mint", "flex": 2}, {"text": "signature", "tone": "peach", "flex": 1}]},
+          {"type": "stat", "value": "5min", "label": "typical short-lived token TTL"}
+        ]},
+        {"type": "row", "blocks": [
+          {"type": "arrow", "direction": "down", "label": "decoded with base64url"},
+          {"type": "arrow", "direction": "right", "label": "the round trip session auth needs"}
+        ]}
+      ]
+    },
+    {
+      "id": "s07", "section": "NARROW · 314", "kicker": "HALF ROW", "headline": "Compare and kv\nat 314 px.",
+      "layout": "split", "narrator": "look", "narration": "narrow check seven",
+      "visual": [
+        {"type": "row", "blocks": [
+          {"type": "compare", "left": {"label": "WHAT IT BUYS", "title": "Scale.", "body": "Any node verifies alone."}, "right": {"label": "WHAT IT COSTS", "title": "Revocation.", "body": "Taking a token back is the hard part."}},
+          {"type": "kv", "title": "app.example.com", "rows": [{"k": "NAME", "v": "sid"}, {"k": "VALUE", "v": "8f4a2c9e1b7d", "tone": "accent"}, {"k": "EXPIRES", "v": "Thu, 01 Jan 2026"}]}
+        ]}
+      ]
+    },
+    {
+      "id": "s08", "section": "NARROW · 314", "kicker": "HALF ROW", "headline": "Tiles, terminal, chips, note\nat 314 px.",
+      "layout": "split", "narrator": "idle", "narration": "narrow check eight",
+      "visual": [
+        {"type": "row", "blocks": [
+          {"type": "tiles", "items": [{"title": "gateway", "sub": "routes traffic"}, {"title": "orders", "sub": "reads /orders"}, {"title": "payments", "sub": "charges cards"}, {"title": "search", "sub": "indexes items"}]},
+          {"type": "terminal", "title": "SERVER · SESSION STORE", "lines": [{"text": "session 8f4a2c9e", "right": "user 1481"}, {"text": "localStorage.getItem('token');", "tone": "accent"}]}
+        ]},
+        {"type": "row", "blocks": [
+          {"type": "chips", "items": [{"text": "Authorization-header"}, {"text": "cookie", "tone": "accent"}]},
+          {"type": "note", "text": "Authorization: Bearer <token> rides on every request"}
+        ]}
+      ]
+    },
+    {
+      "id": "s09", "section": "NARROW · 314", "kicker": "HALF ROW", "headline": "Code, browser, checklist, card\nat 314 px.",
+      "layout": "split", "narrator": "look", "narration": "narrow check nine",
+      "visual": [
+        {"type": "row", "blocks": [
+          {"type": "code", "title": "SCRIPT ON THE PAGE", "lang": "js", "code": "const stolen = document.cookie;"},
+          {"type": "browser", "url": "app.example.com/login", "rows": [{"label": "POST", "text": "/login", "tag": "200"}]}
+        ]},
+        {"type": "row", "blocks": [
+          {"type": "checklist", "items": [{"text": "signature checks out", "sub": "re-signed with the key", "checked": true}]},
+          {"type": "card", "label": "RUNNING MORE THAN ONE SERVER?", "title": "one shared store", "body": "every server reads the same rows", "accentBar": true}
+        ]}
+      ]
+    },
+    {
+      "id": "s10", "section": "NARROW · 314", "kicker": "HALF ROW", "headline": "Steps and meter\nat 314 px.",
+      "layout": "split", "narrator": "idle", "narration": "narrow check ten",
+      "visual": [
+        {"type": "row", "blocks": [
+          {"type": "steps", "items": [{"text": "a user asks a question", "sub": "one request", "state": "active"}, {"text": "search the vector database", "state": "dim"}]},
+          {"type": "meter", "label": "EXPOSURE TO CROSS-SITE SCRIPTING", "value": 0.3, "right": "LOWER", "tone": "mint"}
+        ]}
+      ]
+    },
+    {
+      "id": "s11", "section": "NARROW · 235", "kicker": "ROW IN THE BIG-NARRATOR COLUMN", "headline": "Segments, stat, arrows\nat 235 px.",
+      "layout": "split", "narrator": "big", "narration": "narrow check eleven",
+      "visual": [
+        {"type": "row", "blocks": [
+          {"type": "segments", "items": [{"text": "header", "tone": "accent", "flex": 1}, {"text": "payload", "tone": "mint", "flex": 2}, {"text": "signature", "tone": "peach", "flex": 1}]},
+          {"type": "stat", "value": "$12,480", "label": "balance after transfer"}
+        ]},
+        {"type": "row", "blocks": [
+          {"type": "arrow", "direction": "down", "label": "decoded with base64url"},
+          {"type": "arrow", "direction": "right", "label": "the round trip session auth needs"}
+        ]}
+      ]
+    },
+    {
+      "id": "s12", "section": "NARROW · 235", "kicker": "ROW IN THE BIG-NARRATOR COLUMN", "headline": "Compare and kv\nat 235 px.",
+      "layout": "split", "narrator": "big", "narration": "narrow check twelve",
+      "visual": [
+        {"type": "row", "blocks": [
+          {"type": "compare", "left": {"label": "WHAT IT BUYS", "title": "Scale.", "body": "Any node verifies alone."}, "right": {"label": "WHAT IT COSTS", "title": "Revocation.", "body": "The hard part."}},
+          {"type": "kv", "title": "app.example.com", "rows": [{"k": "NAME", "v": "sid"}, {"k": "VALUE", "v": "8f4a2c9e1b7d", "tone": "accent"}, {"k": "EXPIRES", "v": "Thu, 01 Jan 2026"}]}
+        ]}
+      ]
+    },
+    {
+      "id": "s13", "section": "NARROW · 235", "kicker": "ROW IN THE BIG-NARRATOR COLUMN", "headline": "Tiles, terminal, chips, note\nat 235 px.",
+      "layout": "split", "narrator": "big", "narration": "narrow check thirteen",
+      "visual": [
+        {"type": "row", "blocks": [
+          {"type": "tiles", "items": [{"title": "gateway", "sub": "routes traffic"}, {"title": "payments", "sub": "charges cards"}]},
+          {"type": "terminal", "title": "SERVER · SESSION STORE", "lines": [{"text": "session 8f4a2c9e", "right": "user 1481"}, {"text": "localStorage.getItem('token');", "tone": "accent"}]}
+        ]},
+        {"type": "row", "blocks": [
+          {"type": "chips", "items": [{"text": "Authorization-header"}, {"text": "cookie", "tone": "accent"}]},
+          {"type": "note", "text": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"}
+        ]}
+      ]
+    },
+    {
+      "id": "s14", "section": "NARROW · 235", "kicker": "ROW IN THE BIG-NARRATOR COLUMN", "headline": "Code, browser, checklist, card\nat 235 px.",
+      "layout": "split", "narrator": "big", "narration": "narrow check fourteen",
+      "visual": [
+        {"type": "row", "blocks": [
+          {"type": "code", "title": "SCRIPT ON THE PAGE", "lang": "js", "code": "const stolen = document.cookie;\n// \"\" nothing to read"},
+          {"type": "browser", "url": "app.example.com/login", "rows": [{"label": "POST", "text": "/login", "tag": "200"}]}
+        ]},
+        {"type": "row", "blocks": [
+          {"type": "checklist", "items": [{"text": "signature checks out", "sub": "re-signed with the key", "checked": true}]},
+          {"type": "card", "label": "RUNNING MORE THAN ONE SERVER?", "title": "one shared store", "body": "every server reads the same rows", "accentBar": true}
+        ]}
+      ]
+    },
+    {
+      "id": "s15", "section": "NARROW · 235", "kicker": "ROW IN THE BIG-NARRATOR COLUMN", "headline": "Steps and meter\nat 235 px.",
+      "layout": "split", "narrator": "big", "narration": "narrow check fifteen",
+      "visual": [
+        {"type": "row", "blocks": [
+          {"type": "steps", "items": [{"text": "a user asks a question", "sub": "one request", "state": "active"}, {"text": "search the vector database", "state": "dim"}]},
+          {"type": "meter", "label": "EXPOSURE TO CROSS-SITE SCRIPTING", "value": 0.3, "right": "LOWER", "tone": "mint"}
+        ]}
+      ]
+    },
+    {
+      "id": "s16", "section": "FLOW · ONE-LINE EMPHASIS", "kicker": "CHAPTER ONE", "headline": "Sessions keep state.", "emphasis": true,
+      "layout": "split", "narrator": "idle", "narration": "flow check sixteen",
+      "visual": [
+        {"type": "terminal", "title": "SERVER", "lines": [{"text": "session 8f4a2c9e", "right": "user 1481"}]}
+      ]
+    },
+    {
+      "id": "s17", "section": "FLOW · BAND + FULL + ASIDE", "kicker": "ON EVERY REQUEST", "headline": "Every request carries the *token* along.", "theme": "accent",
+      "layout": "full", "narrator": "idle", "narration": "flow check seventeen",
+      "visual": [
+        {"type": "compare", "left": {"label": "WHAT IT BUYS", "title": "Scale.", "body": "Any node verifies alone. No shared secret to keep alive."}, "right": {"label": "WHAT IT COSTS", "title": "Revocation.", "body": "Taking a token back is suddenly the hard part."}, "caption": "the same property, read twice"}
+      ]
+    },
+    {
+      "id": "s18", "section": "FLOW · LONG NORMAL HEADLINE", "kicker": "WRAPS TO TWO LINES", "headline": "A normal headline just long enough to wrap onto two lines",
+      "layout": "split", "narrator": "idle", "narration": "flow check eighteen",
+      "visual": [
+        {"type": "card", "label": "BANKING", "title": "Acme Bank", "body": "ends the moment you say so"}
+      ]
+    },
+    {
+      "id": "s19", "section": "NARROW · 482", "kicker": "BIG-NARRATOR COLUMN", "headline": "Code\nat 482 px.",
+      "layout": "split", "narrator": "big", "narration": "narrow check nineteen",
+      "visual": [
+        {"type": "code", "title": "SCRIPT ON THE PAGE", "lang": "js", "code": "const stolen = document.cookie;\n// \"\" nothing to read, the browser keeps it"}
+      ]
+    },
+    {
+      "id": "s20", "section": "ASIDE · LIGHT EMPHASIS", "kicker": "CHAPTER ONE", "headline": "Sessions keep\n*state*.", "emphasis": true,
+      "layout": "split", "narrator": "idle", "aside": "Both JWT and sessions solve this; they keep the answer somewhere else.", "narration": "aside check twenty",
+      "visual": [
+        {"type": "terminal", "title": "SERVER · SESSION STORE", "lines": [{"text": "session 8f4a2c9e", "right": "user 1481"}]}
+      ]
+    },
+    {
+      "id": "s21", "section": "ASIDE · ACCENT BAND", "kicker": "ON EVERY REQUEST", "headline": "Every request carries the *token* along.", "theme": "accent",
+      "layout": "split", "narrator": "look", "aside": "The server remembers you, so each request costs one more lookup to it.", "narration": "aside check twenty-one",
+      "visual": [
+        {"type": "note", "text": "Authorization: Bearer <token>"}
+      ]
+    }
+  ]
+}
